@@ -1,0 +1,440 @@
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Yig’i Kompasi"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icon.png"><link rel="icon" href="icon.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head><body>
+<title>Yig’i Kompasi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap">
+<style>
+/* Layout: a one-handed night tool. Inputs on the left, a sticky answer on the right; one column on a phone. */
+:root{
+  --bg:#E9F0F3; --surface:#FFFFFF; --ink:#16323F; --muted:#526C78; --line:#CFDDE3;
+  --accent:#AD1F56; --accent-ink:#FFFFFF; --soft:#F7DFE8;
+  --ikat1:#23407A; --ikat2:#E2A32B; --ikat3:#AD1F56;
+  --danger:#B3221A; --danger-bg:#FCE4E1; --warn:#8A5A00; --warn-bg:#FBF0D4;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito Sans","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1A28; --surface:#172839; --ink:#E7EFF3; --muted:#A3B8C4; --line:#2B4154;
+  --accent:#FF86AE; --accent-ink:#2A0A18; --soft:#3A2233;
+  --ikat1:#6F8FD6; --ikat2:#EDB64A; --ikat3:#FF86AE;
+  --danger:#FF9A8C; --danger-bg:#3D1C1B; --warn:#F2C76B; --warn-bg:#36290F;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1A28; --surface:#172839; --ink:#E7EFF3; --muted:#A3B8C4; --line:#2B4154;
+  --accent:#FF86AE; --accent-ink:#2A0A18; --soft:#3A2233;
+  --ikat1:#6F8FD6; --ikat2:#EDB64A; --ikat3:#FF86AE;
+  --danger:#FF9A8C; --danger-bg:#3D1C1B; --warn:#F2C76B; --warn-bg:#36290F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--body)}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));padding-block:20px 96px}
+.ikat{display:block;width:100%;height:16px}
+header{display:grid;gap:4px;padding-block:14px 18px}
+h1{font:700 clamp(2.1rem,6vw,3rem)/1.05 var(--display);margin:0;text-wrap:balance}
+.lead{margin:0;color:var(--muted);max-width:58ch}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+.col{display:grid;gap:26px;min-width:0}
+.answer{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px)}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}.answer{position:static}}
+h2{font:700 1.3rem/1.2 var(--display);margin:0 0 8px;text-wrap:balance}
+p{margin:0}
+.muted{color:var(--muted);font-size:.92rem}
+.sample{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;background:var(--warn-bg);color:var(--warn);padding:10px 14px;border-radius:10px;font-weight:600;font-size:.93rem}
+.sample span{min-width:0;flex:1 1 220px}
+button{font:inherit;color:inherit;cursor:pointer}
+.link{background:none;border:0;padding:4px 0;text-decoration:underline;font-weight:800;color:inherit}
+.rec{display:flex;align-items:center;gap:14px;margin-block:14px 4px;flex-wrap:wrap}
+.recbtn{display:inline-flex;align-items:center;gap:12px;background:var(--accent);color:var(--accent-ink);border:0;font-weight:800;font-size:1.1rem;padding:16px 26px;border-radius:999px;min-height:58px}
+.recbtn .dot{width:16px;height:16px;border-radius:50%;background:currentColor}
+.recbtn.on .dot{border-radius:3px;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.timer{font:700 1.5rem/1 var(--display);font-variant-numeric:tabular-nums;color:var(--muted)}
+.recbtn.on + .timer{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.recbtn.on .dot{animation:none}}
+.picks{display:flex;flex-wrap:wrap;gap:10px;margin-block:12px 8px}
+.pick{display:inline-block;background:var(--accent);color:var(--accent-ink);font-weight:800;padding:13px 22px;border-radius:12px;cursor:pointer}
+.pick.alt{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+input[type=file]{position:absolute;opacity:0;width:1px;height:1px}
+input[type=file]:focus-visible + .pick,button:focus-visible,.flag input:focus-visible{outline:3px solid var(--ikat2);outline-offset:2px}
+.status{font-size:.93rem;font-weight:600;overflow-wrap:anywhere}
+.status.err{color:var(--danger)}
+.q{display:grid;gap:7px}
+.qs{display:grid;gap:16px}
+.q label,.q .ql{font-weight:800;font-size:.97rem}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:transparent;border:1.5px solid var(--line);padding:8px 13px;border-radius:999px;font-weight:600;font-size:.94rem;min-height:40px}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:800}
+.flags{display:grid;gap:2px}
+.flag{display:flex;gap:10px;align-items:flex-start;padding:7px 0;cursor:pointer}
+.flag input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--danger);flex:none}
+.card{background:var(--surface);border-radius:18px;padding:20px;display:grid;gap:16px;min-width:0}
+.conf{display:inline-block;background:var(--soft);padding:3px 11px;border-radius:999px;font-size:.84rem;font-weight:800}
+.top small{display:block;font-weight:800;color:var(--muted);font-size:.86rem}
+.top b{display:block;font:700 2.2rem/1.1 var(--display);color:var(--accent)}
+.tips{margin:0;padding-left:20px;display:grid;gap:5px}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr);gap:10px;align-items:center;font-size:.92rem}
+.track{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.fill{height:100%;background:var(--muted);border-radius:5px;transition:width .3s}
+.bar.first{font-weight:800}.bar.first .fill{background:var(--accent)}
+.danger{background:var(--danger-bg);color:var(--danger);border-radius:14px;padding:14px 16px;display:grid;gap:4px}
+.danger b{font:700 1.35rem/1.2 var(--display)}
+.danger a{color:inherit;font-weight:800}
+canvas{display:block;width:100%;height:64px}
+.meas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:440px){.meas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.meas div{min-width:0}
+.meas b{display:block;font:700 1.25rem/1.15 var(--display);font-variant-numeric:tabular-nums}
+.meas span{font-size:.8rem;color:var(--muted);display:block;line-height:1.25}
+details summary{cursor:pointer;font-weight:800}
+details p{margin-top:8px}
+.calm{border-top:1px solid var(--line);padding-top:14px}
+.pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 14px);background:var(--ink);color:var(--bg);border:0;padding:11px 20px;border-radius:999px;font-weight:800;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:5}
+.pill.alert{background:var(--danger);color:var(--surface)}
+@media (min-width:821px){.pill{display:none}}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+
+<svg class="ikat" aria-hidden="true"><defs><pattern id="ik" width="34" height="16" patternUnits="userSpaceOnUse"><rect width="34" height="16" fill="var(--ikat1)"/><path d="M17 0l13 8-13 8L4 8z" fill="var(--ikat2)"/><path d="M17 4l6 4-6 4-6-4z" fill="var(--ikat3)"/></pattern></defs><rect width="100%" height="16" fill="url(#ik)"/></svg>
+
+<div class="wrap">
+  <header>
+    <h1>Yig’i Kompasi</h1>
+    <p class="lead">Chaqaloq nega yig’layotganini topishga yordam beradi. Yig’ini yuklang va bir necha savolga javob bering. Natija taxmin bo’ladi, tashxis emas.</p>
+  </header>
+
+  <div class="grid">
+    <div class="col">
+      <div class="sample" id="sampleBar">
+        <span>Namuna ko’rsatilmoqda: sun’iy ovoz va misol javoblar.</span>
+        <button class="link" id="clearBtn" type="button">Tozalash</button>
+      </div>
+
+      <section>
+        <h2>1. Yig’ini yozib oling</h2>
+        <p class="muted">“Yozishni boshlash”ni bosing va telefonni chaqaloqdan 30–50 sm uzoqda tuting. 20 soniyadan keyin yozuv o’zi to’xtaydi. Ovoz qurilmangizdan chiqmaydi.</p>
+        <div class="rec"><button class="recbtn" id="recBtn" type="button"><span class="dot"></span><span id="recLabel">Yozishni boshlash</span></button><span class="timer" id="recTime">0:20</span></div>
+        <div class="picks">
+          <input type="file" id="cam" accept="video/*" capture="environment">
+          <label class="pick alt" for="cam">Videoga yozish</label>
+          <input type="file" id="file" accept="audio/*,video/*,.m4a,.mp3,.wav,.ogg,.oga,.opus,.aac,.mp4,.mov">
+          <label class="pick alt" for="file">Tayyor faylni tanlash</label>
+        </div>
+        <p class="status" id="status" role="status"></p>
+        <button class="pick" id="listenBtn" type="button" hidden>Ovozni tahlil qilish</button>
+      </section>
+
+      <section>
+        <h2>2. Savollarga javob bering</h2>
+        <div class="qs" id="qs"></div>
+      </section>
+
+      <section>
+        <h2>3. Xavfli belgilar bormi?</h2>
+        <div class="flags" id="flags"></div>
+      </section>
+    </div>
+
+    <div class="col answer" id="natija">
+      <div class="card" id="result" aria-live="polite"></div>
+      <details>
+        <summary>Natija qanday chiqadi?</summary>
+        <p class="muted">Ilova yozuvdan ovoz tonini, yig’i to’lqinlari va tanaffuslarni o’lchaydi. Yig’ining o’zidan sababni aniq bilishning ishonchli usuli hali yo’q, shuning uchun ovoz natijaga oz ta’sir qiladi. Asosiy hisob sizning javoblaringizga tayanadi: oxirgi ovqat, uyg’oqlik vaqti, taglik va boshqalar.</p>
+      </details>
+      <p class="muted calm">Juda charchasangiz, chaqaloqni orqasiga, xavfsiz joyga yotqizib, bir necha daqiqa nafas oling. Chaqaloqni hech qachon silkitmang.</p>
+    </div>
+  </div>
+</div>
+<button class="pill" id="pill" type="button" hidden></button>
+
+<script>
+const QUESTIONS=[
+  {k:'age',t:'Yoshi',o:[['0','0–3 oy'],['1','3–6 oy'],['2','6–12 oy'],['3','1 yoshdan katta']]},
+  {k:'feed',t:'Oxirgi marta qachon ovqatlandi?',o:[['0','1 soatdan kam'],['1','1–2 soat oldin'],['2','2–3 soat oldin'],['3','3 soatdan ko’p']]},
+  {k:'awake',t:'Qancha vaqtdan beri uyg’oq?',o:[['0','1 soatdan kam'],['1','1–2 soat'],['2','2–3 soat'],['3','3 soatdan ko’p']]},
+  {k:'diaper',t:'Tagligi qanday?',o:[['clean','Toza'],['wet','Ho’l yoki iflos'],['unknown','Tekshirmadim']]},
+  {k:'held',t:'Qo’lga olsangiz tinchlanadimi?',o:[['yes','Ha'],['no','Yo’q']]},
+  {k:'legs',t:'Oyoqlarini qorniga tortyaptimi?',o:[['yes','Ha'],['no','Yo’q']]}
+];
+const FLAGS=[
+  ['breath','urgent','Nafas olishi qiyin yoki lablari ko’kargan'],
+  ['limp','urgent','Bo’shashib qolgan yoki uyg’onmayapti'],
+  ['seizure','urgent','Tutqanoq bo’ldi'],
+  ['fever3','urgent','3 oygacha va harorati 38°C yoki undan yuqori'],
+  ['font','urgent','Bosh tepasidagi liqildoq bo’rtib chiqqan'],
+  ['green','urgent','Yashil qusyapti yoki najasida qon bor'],
+  ['shriek','doctor','Yig’isi odatdagidan butunlay boshqacha, juda ingichka'],
+  ['hours','doctor','2–3 soatdan beri hech narsa bilan tinchlanmayapti'],
+  ['nofeed','doctor','Ovqatdan bosh tortyapti yoki 6 soatdan beri tagligi ho’l bo’lmagan']
+];
+const CAUSES={
+  hungry:{n:'Och',tips:['Emizib yoki shishadan ovqatlantirib ko’ring.','Belgilari: og’zini ochadi, qo’lini so’radi, lablarini chapillatadi.'],next:'ovqat berib ko’ring'},
+  tired:{n:'Uyqusi kelgan',tips:['Xonani xiralashtiring, shovqinni kamaytiring, yengil tebrating.','Belgilari: esnaydi, ko’zini ishqalaydi, bir nuqtaga tikiladi.','Orqasiga, tekis joyga yotqizing.'],next:'uxlatib ko’ring'},
+  discomfort:{n:'Noqulaylik',tips:['Taglikni tekshiring va almashtiring.','Kiyimi qisib qo’ymaganini ko’ring.','Ensasini ushlab ko’ring: terlagan bo’lsa yengilroq, sovuq bo’lsa issiqroq kiyintiring.'],next:'taglik va kiyimni tekshiring'},
+  gas:{n:'Qorin yoki gaz',tips:['Tik ko’tarib, orqasini silab kekirtiring.','Oyoqlarini sekin velosiped kabi aylantiring.','Qornini soat yo’nalishida yengil silang.'],next:'kekirtirib, qornini silang'},
+  pain:{n:'Og’riq yoki betoblik',tips:['Haroratini o’lchang.','Barmoqlari va oyoq barmoqlariga soch o’ralib qolmaganini tekshiring.','Tinchlantirib bo’lmasa, shifokorga murojaat qiling.'],next:'haroratini o’lchang'},
+  comfort:{n:'Yaqinlik yoki charchash',tips:['Qo’lingizga oling, ko’kragingizga bosing.','Past ovozda gapiring yoki alla ayting.','Shovqin va yorug’likdan uzoqroq joyga o’ting.'],next:'qo’lingizga olib, tinch joyga o’ting'}
+};
+
+const state={answers:{},flags:{},audio:null,sample:false};
+
+/* ---------- sound measurement ---------- */
+function pct(sorted,p){return sorted[Math.min(sorted.length-1,Math.floor(p*sorted.length))]}
+function mean(a){return a.length?a.reduce((s,v)=>s+v,0)/a.length:0}
+
+function analyze(x,sr){
+  const n=Math.min(x.length,60*sr), dur=n/sr;
+  if(dur<5) return {error:'short'};
+  const fl=Math.round(.04*sr), hop=Math.round(.02*sr), rms=[];
+  for(let i=0;i+fl<=n;i+=hop){let e=0;for(let j=0;j<fl;j++)e+=x[i+j]*x[i+j];rms.push(Math.sqrt(e/fl))}
+  const sorted=[...rms].sort((a,b)=>a-b), floor=pct(sorted,.1), peak=pct(sorted,.97);
+  if(peak<.008) return {error:'quiet'};
+  if(peak/(floor+1e-6)<2.5) return {error:'noise'};
+  const th=floor+.3*(peak-floor), act=rms.map(v=>v>th);
+  for(let i=0,gap=0;i<act.length;i++){ // close gaps under 100 ms
+    if(act[i]){if(gap>0&&gap<5&&i-gap-1>=0&&act[i-gap-1])for(let j=i-gap;j<i;j++)act[j]=true;gap=0}else gap++;
+  }
+  const bouts=[];
+  for(let i=0;i<act.length;){if(!act[i]){i++;continue}let j=i;while(j<act.length&&act[j])j++;if(j-i>=8)bouts.push([i,j]);i=j}
+  if(!bouts.length) return {error:'noise'};
+
+  const lagMin=Math.floor(sr/1000), lagMax=Math.ceil(sr/220), f0=[]; let tried=0;
+  for(const [a,b] of bouts)for(let f=a;f<b;f+=2){
+    tried++;
+    const s=f*hop, w=new Float32Array(fl); let m=0;
+    for(let i=0;i<fl;i++)m+=x[s+i];m/=fl;
+    for(let i=0;i<fl;i++)w[i]=x[s+i]-m;
+    const r=new Float32Array(lagMax+2);
+    for(let l=lagMin-1;l<=lagMax+1;l++){let c=0,e1=0,e2=0;for(let i=0;i+l<fl;i++){c+=w[i]*w[i+l];e1+=w[i]*w[i];e2+=w[i+l]*w[i+l]}r[l]=c/(Math.sqrt(e1*e2)+1e-9)}
+    let best=0;const peaks=[];
+    for(let l=lagMin;l<=lagMax;l++)if(r[l]>r[l-1]&&r[l]>=r[l+1]){peaks.push(l);if(r[l]>best)best=r[l]}
+    if(best<.6)continue;
+    const l=peaks.find(p=>r[p]>=.9*best), d=r[l-1]-2*r[l]+r[l+1], off=d?.5*(r[l-1]-r[l+1])/d:0;
+    f0.push(sr/(l+off));
+  }
+  const fs=[...f0].sort((a,b)=>a-b), f0med=fs.length?pct(fs,.5):0, voicing=tried?f0.length/tried:0;
+  const hs=hop/sr, durs=bouts.map(b=>(b[1]-b[0])*hs), pauses=[];
+  for(let i=1;i<bouts.length;i++)pauses.push((bouts[i][0]-bouts[i-1][1])*hs);
+  const onsets=[];for(let i=1;i<bouts.length;i++)onsets.push((bouts[i][0]-bouts[i-1][0])*hs);
+  const om=mean(onsets), cv=onsets.length>=2&&om?Math.sqrt(mean(onsets.map(v=>(v-om)**2)))/om:null;
+  const rise=bouts.map(([a,b])=>{let mx=0;for(let i=a;i<b;i++)if(rms[i]>mx)mx=rms[i];let i=a;while(i<b&&rms[i]<.8*mx)i++;return (i-a)*hs});
+  const env=[],bins=200,step=rms.length/bins;
+  for(let i=0;i<bins;i++){let v=0,on=false;const e=Math.min(rms.length,Math.ceil((i+1)*step));for(let j=Math.floor(i*step);j<e;j++){if(rms[j]>v)v=rms[j];on=on||act[j]}env.push([v/(peak||1),on])}
+  return {ok:true,notCry:fs.length<5||f0med<260||f0med>900||voicing<.2,dur,f0med,f0p90:fs.length?pct(fs,.9):0,voicing,
+    boutsPerMin:bouts.length/dur*60,meanBout:mean(durs),meanPause:mean(pauses),cv,rise:mean(rise),duty:mean(act.map(v=>v?1:0)),env};
+}
+
+/* ---------- combining answers with the sound ---------- */
+function score(a,s){
+  const c={hungry:1,tired:1,discomfort:1,gas:1,pain:1,comfort:1}, age=a.age===undefined?1:+a.age;
+  if(a.feed!==undefined){const f=+a.feed;
+    c.hungry+=[-.6,.5,2,3.5][f]+(age===0&&f>0?.5:0);
+    if(f===0)c.gas+=.6;
+  }
+  if(a.awake!==undefined){
+    const hours=[.5,1.5,2.5,3.5][+a.awake], limit=[1.5,2.5,3.5,5][age];
+    c.tired+=Math.max(-.5,Math.min(3.5,(hours/limit-.6)*3.5));
+  }
+  if(a.diaper==='wet')c.discomfort+=3.5; else if(a.diaper==='unknown')c.discomfort+=.8; else if(a.diaper==='clean')c.discomfort-=.5;
+  if(a.held==='yes'){c.comfort+=3;c.pain-=.7} else if(a.held==='no'){c.pain+=.8;c.gas+=.5;c.comfort-=.5}
+  if(a.legs==='yes')c.gas+=3; else if(a.legs==='no')c.gas-=.3;
+  if(age===0)c.gas+=.4;
+  if(s&&s.ok&&!s.notCry){
+    if(s.f0med>550)c.pain+=Math.min(1.5,(s.f0med-550)/150);
+    if(s.meanBout>2.2)c.pain+=.4;
+    if(s.rise<.1)c.pain+=.3;
+    if(s.cv!==null&&s.cv<.35&&s.boutsPerMin>=20)c.hungry+=1;
+    if(s.cv!==null&&s.cv>.6)c.discomfort+=.5;
+    if(s.duty<.45&&s.f0med<450)c.tired+=.8;
+    if(s.duty<.35)c.comfort+=.6;
+    if(s.meanBout>1.6&&s.f0med>480)c.gas+=.7;
+  }
+  const entries=Object.entries(c).map(([k,v])=>[k,Math.max(.2,v)]), sum=entries.reduce((t,e)=>t+e[1],0);
+  return entries.map(([k,v])=>({k,share:v/sum})).sort((x,y)=>y.share-x.share);
+}
+
+/* ---------- synthetic example, so the first view shows a worked result ---------- */
+function makeSample(){
+  const sr=16000,n=sr*14,x=new Float32Array(n);let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+  for(let i=0;i<n;i++)x[i]=(rnd()-.5)*.006;
+  let t=.3;
+  while(t<13){const d=.75+rnd()*.15,s=Math.floor(t*sr),len=Math.floor(d*sr);let ph=0;
+    for(let i=0;i<len&&s+i<n;i++){const p=i/len,f=400+70*Math.sin(Math.PI*p);ph+=2*Math.PI*f/sr;
+      const e=Math.min(1,p*14)*Math.min(1,(1-p)*8)*.3;
+      x[s+i]+=e*(Math.sin(ph)+.5*Math.sin(2*ph)+.25*Math.sin(3*ph))}
+    t+=d+.48+rnd()*.08}
+  return {x,sr};
+}
+
+/* ---------- reading a file ---------- */
+async function decode(buf){
+  let ab;
+  try{ab=await new OfflineAudioContext(1,16000,16000).decodeAudioData(buf.slice(0))}
+  catch(e){const C=window.AudioContext||window.webkitAudioContext,ctx=new C();try{ab=await ctx.decodeAudioData(buf)}finally{ctx.close&&ctx.close()}}
+  let x=ab.getChannelData(0),sr=ab.sampleRate;
+  if(sr>20000){const k=Math.floor(sr/16000),y=new Float32Array(Math.floor(x.length/k));for(let i=0;i<y.length;i++){let s=0;for(let j=0;j<k;j++)s+=x[i*k+j];y[i]=s/k}x=y;sr=sr/k}
+  return {x,sr};
+}
+const ERR={short:'Yozuv juda qisqa. Kamida 5 soniya yozing.',quiet:'Ovoz juda past. Telefonni chaqaloqqa 30–50 sm yaqin tuting va qayta yozing.',noise:'Yig’ini shovqindan ajratib bo’lmadi. Televizor yoki ventilyatorni o’chirib, qayta yozing.',decode:'Bu faylni ochib bo’lmadi. “Videoga yozish” tugmasi bilan yozing yoki M4A, MP3 faylni tanlang. Telegram ovozli xabarlari iPhone’da ochilmasligi mumkin.'};
+function setStatus(t,err){const s=document.getElementById('status');s.textContent=t;s.className='status'+(err?' err':'')}
+function finish(x,sr,name){
+  const res=analyze(x,sr);
+  if(res.error){setStatus(ERR[res.error],true)}
+  else if(res.notCry){setStatus('Bu yozuv chaqaloq yig’isiga o’xshamadi. Natija faqat javoblaringiz bo’yicha ko’rsatildi.',true)}
+  else{state.audio=res;setStatus('Yozuv tahlil qilindi'+(res.dur>=59?' (birinchi 60 soniya).':'.'))}
+  render();
+}
+/* Second path: iPhone videos (.mov) often fail decodeAudioData, so play the file silently through the audio graph and collect the samples. */
+let pending=null;
+const listenBtn=document.getElementById('listenBtn');
+function listen(f){
+  return new Promise((resolve,reject)=>{
+    const C=window.AudioContext||window.webkitAudioContext, ctx=new C(), el=document.createElement('video');
+    el.playsInline=true;el.setAttribute('playsinline','');el.preload='auto';
+    const url=URL.createObjectURL(f);el.src=url;
+    const src=ctx.createMediaElementSource(el), proc=ctx.createScriptProcessor(4096,1,1), mute=ctx.createGain();
+    mute.gain.value=0;src.connect(proc);proc.connect(mute);mute.connect(ctx.destination);
+    const chunks=[];let total=0,done=false;const max=60*ctx.sampleRate;
+    proc.onaudioprocess=ev=>{if(done||el.paused)return;const d=ev.inputBuffer.getChannelData(0);chunks.push(new Float32Array(d));total+=d.length;if(total>=max)stop()};
+    const tick=setInterval(()=>{const left=Math.max(0,Math.ceil(Math.min(el.duration||60,60)-el.currentTime));setStatus('Tahlil qilinmoqda… '+left+' soniya qoldi')},500);
+    function stop(){if(done)return;done=true;clearInterval(tick);el.pause();
+      const x=new Float32Array(total);let o=0;for(const c of chunks){x.set(c,o);o+=c.length}
+      try{proc.disconnect();src.disconnect()}catch(e){}ctx.close&&ctx.close();URL.revokeObjectURL(url);
+      let sr=ctx.sampleRate,y=x;if(sr>20000){const k=Math.floor(sr/16000);y=new Float32Array(Math.floor(x.length/k));for(let i=0;i<y.length;i++){let s=0;for(let j=0;j<k;j++)s+=x[i*k+j];y[i]=s/k}sr=sr/k}
+      resolve({x:y,sr});}
+    el.onended=stop;
+    el.onerror=()=>{if(done)return;done=true;clearInterval(tick);ctx.close&&ctx.close();URL.revokeObjectURL(url);reject(new Error('play'))};
+    ctx.resume().then(()=>el.play()).catch(err=>{if(!done){done=true;clearInterval(tick);ctx.close&&ctx.close();reject(err)}});
+  });
+}
+listenBtn.addEventListener('click',async()=>{
+  if(!pending)return;listenBtn.hidden=true;
+  try{const {x,sr}=await listen(pending);finish(x,sr)}catch(e){setStatus(ERR.decode,true)}
+  pending=null;
+});
+async function onPick(e){
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  if(state.sample){state.sample=false;state.answers={};syncInputs()}
+  state.audio=null;pending=null;listenBtn.hidden=true;setStatus('Tahlil qilinmoqda…');render();
+  try{
+    const buf=await f.arrayBuffer();const {x,sr}=await decode(buf);
+    await new Promise(r=>setTimeout(r,30));
+    finish(x,sr);
+  }catch(err){
+    pending=f;listenBtn.hidden=false;
+    setStatus('Yozuv tayyor. Tahlilni boshlash uchun pastdagi tugmani bosing, u ovozsiz tinglab chiqadi.');
+  }
+}
+document.getElementById('file').addEventListener('change',onPick);
+document.getElementById('cam').addEventListener('change',onPick);
+/* ---------- live microphone (works on the hosted https page) ---------- */
+const recBtn=document.getElementById('recBtn'),recLabel=document.getElementById('recLabel'),recTime=document.getElementById('recTime');
+const REC_SEC=20;let rec=null;
+function stopRec(analyzeIt){
+  if(!rec)return;const r=rec;rec=null;clearInterval(r.tick);
+  try{r.proc.disconnect();r.src.disconnect()}catch(e){}
+  r.stream.getTracks().forEach(t=>t.stop());r.ctx.close&&r.ctx.close();
+  recBtn.classList.remove('on');recLabel.textContent='Yana yozish';recTime.textContent='0:'+String(REC_SEC).padStart(2,'0');
+  if(!analyzeIt)return;
+  const x=new Float32Array(r.total);let o=0;for(const c of r.chunks){x.set(c,o);o+=c.length}
+  let sr=r.ctx.sampleRate,y=x;if(sr>20000){const k=Math.floor(sr/16000);y=new Float32Array(Math.floor(x.length/k));for(let i=0;i<y.length;i++){let s=0;for(let j=0;j<k;j++)s+=x[i*k+j];y[i]=s/k}sr=sr/k}
+  finish(y,sr);
+}
+recBtn.addEventListener('click',async()=>{
+  if(rec){stopRec(true);return}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){setStatus('Bu brauzer mikrofonni qo’llamaydi. Safari’da oching yoki “Videoga yozish”dan foydalaning.',true);return}
+  const C=window.AudioContext||window.webkitAudioContext,ctx=new C();
+  let stream;
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
+  catch(e){ctx.close&&ctx.close();setStatus(e&&e.name==='NotAllowedError'?'Mikrofonga ruxsat berilmadi. iPhone: Sozlamalar → Safari → Mikrofon → “Ruxsat berish”, keyin sahifani yangilang.':'Mikrofonni ochib bo’lmadi. Boshqa ilova mikrofonni ishlatmayotganini tekshiring.',true);return}
+  await ctx.resume();
+  if(state.sample){state.sample=false;state.answers={};syncInputs()}
+  state.audio=null;pending=null;listenBtn.hidden=true;render();
+  const src=ctx.createMediaStreamSource(stream),proc=ctx.createScriptProcessor(4096,1,1),mute=ctx.createGain();mute.gain.value=0;
+  src.connect(proc);proc.connect(mute);mute.connect(ctx.destination);
+  rec={ctx,stream,src,proc,chunks:[],total:0,start:Date.now()};
+  proc.onaudioprocess=ev=>{if(!rec)return;const d=ev.inputBuffer.getChannelData(0);rec.chunks.push(new Float32Array(d));rec.total+=d.length};
+  rec.tick=setInterval(()=>{if(!rec)return;const left=Math.max(0,REC_SEC-Math.floor((Date.now()-rec.start)/1000));recTime.textContent='0:'+String(left).padStart(2,'0');if(left<=0)stopRec(true)},250);
+  recBtn.classList.add('on');recLabel.textContent='To’xtatish';setStatus('Yozilmoqda… chaqaloq yig’isini yaqinroqdan yozing.');
+});
+
+
+/* ---------- interface ---------- */
+function buildInputs(){
+  const qs=document.getElementById('qs');
+  QUESTIONS.forEach(q=>{
+    const d=document.createElement('div');d.className='q';
+    const l=document.createElement('div');l.className='ql';l.textContent=q.t;l.id='l-'+q.k;
+    const c=document.createElement('div');c.className='chips';c.setAttribute('role','group');c.setAttribute('aria-labelledby','l-'+q.k);
+    q.o.forEach(([v,t])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.id='c-'+q.k+'-'+v;b.textContent=t;b.dataset.k=q.k;b.dataset.v=v;
+      b.addEventListener('click',()=>{if(state.answers[q.k]===v)delete state.answers[q.k];else state.answers[q.k]=v;syncInputs();render()});c.appendChild(b)});
+    d.append(l,c);qs.appendChild(d);
+  });
+  const fl=document.getElementById('flags');
+  FLAGS.forEach(([k,lv,t])=>{const l=document.createElement('label');l.className='flag';const i=document.createElement('input');i.type='checkbox';i.id='f-'+k;
+    i.addEventListener('change',()=>{if(i.checked)state.flags[k]=lv;else delete state.flags[k];render()});
+    const s=document.createElement('span');s.textContent=t;l.append(i,s);fl.appendChild(l)});
+}
+function syncInputs(){
+  document.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',state.answers[b.dataset.k]===b.dataset.v?'true':'false'));
+  document.querySelectorAll('.flag input').forEach(i=>{i.checked=!!state.flags[i.id.slice(2)]});
+}
+function dangerHtml(level){
+  if(level==='urgent')return '<div class="danger"><b>Darhol tez yordam chaqiring: <a href="tel:103">103</a></b><span>Belgilangan alomat shoshilinch yordam talab qiladi. Sabablarni tekshirib vaqt yo’qotmang.</span></div>';
+  return '<div class="danger"><b>Bugun shifokorga ko’rsating</b><span>Belgilangan alomatni pediatr ko’rishi kerak. Ahvoli yomonlashsa, 103 raqamiga qo’ng’iroq qiling.</span></div>';
+}
+function render(){
+  document.getElementById('sampleBar').hidden=!state.sample;
+  const r=document.getElementById('result'),pill=document.getElementById('pill');
+  const levels=Object.values(state.flags), level=levels.includes('urgent')?'urgent':levels.length?'doctor':null;
+  const answered=Object.keys(state.answers).filter(k=>k!=='age').length, s=state.audio;
+  if(level==='urgent'){r.innerHTML=dangerHtml('urgent');pill.textContent='Tez yordam: 103';pill.className='pill alert';updatePill();return}
+  if(!answered&&!s){
+    r.innerHTML=(level?dangerHtml(level):'')+'<div><h2>Natija shu yerda chiqadi</h2><p class="muted">Yig’i yozuvini yuklang yoki savollarga javob bering. Javob qancha ko’p bo’lsa, taxmin shuncha aniqroq.</p></div>';
+    pill.textContent='Natijani ko’rish';pill.className='pill'+(level?' alert':'');updatePill();return;
+  }
+  const list=score(state.answers,s), first=list[0], second=list[1], c=CAUSES[first.k], max=first.share;
+  const conf=answered>=4?'o’rtacha':answered>=2?'past-o’rtacha':'past';
+  let h=level?dangerHtml('doctor'):'';
+  h+='<div class="top"><small>Eng ehtimol sabab'+(state.sample?' (namuna)':'')+'</small><b>'+c.n+'</b></div>';
+  h+='<div><span class="conf">Taxmin ishonchi: '+conf+'</span></div>';
+  h+='<ul class="tips">'+c.tips.map(t=>'<li>'+t+'</li>').join('')+'</ul>';
+  h+='<p class="muted"><strong>Yordam bermasa:</strong> '+CAUSES[second.k].n.toLowerCase()+' bo’lishi mumkin, '+CAUSES[second.k].next+'.'+(first.share-second.share<.05?' Bu ikki sabab juda yaqin, osonini avval tekshiring.':'')+'</p>';
+  h+='<div class="bars">'+list.map((e,i)=>'<div class="bar'+(i?'':' first')+'"><span>'+CAUSES[e.k].n+'</span><div class="track"><div class="fill" style="width:'+Math.round(e.share/max*100)+'%"></div></div></div>').join('')+'</div>';
+  if(s){h+='<canvas id="wave" role="img" aria-label="Yozuvning ovoz to’lqini"></canvas>';
+    h+='<div class="meas"><div><b>'+Math.round(s.f0med)+' Hz</b><span>ovoz toni (odatda 300–600)</span></div><div><b>'+Math.round(s.boutsPerMin)+'</b><span>to’lqin / daqiqa</span></div><div><b>'+s.meanBout.toFixed(1)+' s</b><span>bir yig’i to’lqini</span></div><div><b>'+s.meanPause.toFixed(1)+' s</b><span>tanaffus</span></div></div>'}
+  r.innerHTML=h;
+  if(s)drawWave();
+  pill.textContent=(level?'Shifokorga ko’rsating · ':'Natija: ')+c.n;pill.className='pill'+(level?' alert':'');updatePill();
+}
+function drawWave(){
+  const cv=document.getElementById('wave');if(!cv||!state.audio)return;
+  const d=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*d;cv.height=h*d;
+  const g=cv.getContext('2d');g.scale(d,d);const st=getComputedStyle(document.documentElement);
+  const on=st.getPropertyValue('--accent').trim(),off=st.getPropertyValue('--line').trim(),env=state.audio.env,bw=w/env.length;
+  env.forEach(([v,a],i)=>{const bar=Math.max(2,Math.min(1,v)*h);g.fillStyle=a?on:off;g.fillRect(i*bw,(h-bar)/2,Math.max(1,bw-.6),bar)});
+}
+let inView=true;
+function updatePill(){document.getElementById('pill').hidden=inView}
+new IntersectionObserver(es=>{inView=es[0].isIntersecting;updatePill()},{threshold:.15}).observe(document.getElementById('natija'));
+document.getElementById('pill').addEventListener('click',()=>{const m=matchMedia('(prefers-reduced-motion:reduce)').matches;document.getElementById('natija').scrollIntoView({behavior:m?'auto':'smooth'})});
+document.getElementById('clearBtn').addEventListener('click',()=>{state.sample=false;state.answers={};state.flags={};state.audio=null;setStatus('');syncInputs();render()});
+new ResizeObserver(drawWave).observe(document.getElementById('result'));
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',drawWave);
+new MutationObserver(drawWave).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+buildInputs();
+const demo=makeSample();
+state.audio=analyze(demo.x,demo.sr);
+state.answers={age:'0',feed:'3',awake:'0',diaper:'clean',held:'no',legs:'no'};
+state.sample=true;
+syncInputs();render();
+</script>
+
+</body></html>
